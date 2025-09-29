@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Calendario de Llegadas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --brand:#0c4f97; --accent:#d81e14; --line:#e5e7eb;
+      --ink:#111; --muted:#6b7280; --bg:#f7f7fb; --radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    header{background:var(--brand);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+    header .brand{display:flex;align-items:center;gap:10px;font-weight:600}
+    header img{height:28px}
+    header a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.35);padding:6px 10px;border-radius:10px}
+
+    main{padding:16px;display:grid;grid-template-columns:1fr 340px;gap:16px}
+    .card{background:#fff;border-radius:var(--radius);box-shadow:0 2px 8px rgba(0,0,0,.06);padding:12px}
+
+    .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
+    .cal-nav{display:flex;gap:6px}
+    .cal-nav button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+    .cal-title{margin:0;font-size:18px}
+
+    .grid{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    .grid.cols-7{grid-template-columns:repeat(7,1fr)}
+    .dow{background:#fafafa;padding:8px;font-size:12px;color:#444;border-right:1px solid var(--line);text-align:center}
+    .dow:last-child{border-right:0}
+    .cell{min-height:110px;border-top:1px solid var(--line);border-right:1px solid var(--line);padding:6px;display:flex;flex-direction:column;gap:6px}
+    .cell:nth-child(7n){border-right:0}
+    .cell .day{font-size:12px;color:#666}
+    .cell.out .day{color:#bbb}
+    .pill{font-size:12px;padding:3px 6px;border-radius:999px;background:#e6eef9;color:var(--brand);display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+    .no-events{color:#aaa;font-size:12px;margin-top:auto}
+
+    #detail h3{margin:0 0 6px}
+    #detail .meta{color:var(--muted);font-size:13px;margin-bottom:8px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:6px 8px;border-bottom:1px solid #eee;font-size:13px}
+    th{background:#fafafa;text-align:left}
+    .right{text-align:right}
+
+    /* ====== responsive solo para calendario ====== */
+    @media (max-width: 980px){
+      main{grid-template-columns:1fr}
+      .cal-title{font-size:16px}
+      .cell{min-height:90px}
+      .pill{width:100%;white-space:normal}
+    }
+    @media (max-width: 680px){
+      .dow{font-size:11px;padding:6px}
+      .cell{min-height:76px;padding:6px}
+      .cal-nav button{padding:5px 8px}
+      /* detalle como cards */
+      #detail thead{display:none}
+      #detail table,#detail tbody,#detail tr,#detail td{display:block;width:100%}
+      #detail tr{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+      #detail td{border-bottom:0;padding:10px 12px}
+      #detail td::before{
+        content: attr(data-label);
+        display:block;font-size:12px;color:var(--muted);margin-bottom:4px
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <!-- <img src="/static/img/logo-tln.png" alt="TLN"> -->
+      <span>Calendario de Llegadas</span>
+    </div>
+    <a href="/logout">Salir</a>
+  </header>
+
+  <main>
+    <!-- Calendario -->
+    <div class="card">
+      <div class="cal-head">
+        <div class="cal-nav">
+          <button id="prevBtn">◀</button>
+          <button id="todayBtn">Hoy</button>
+          <button id="nextBtn">▶</button>
+        </div>
+        <h3 id="calTitle" class="cal-title"></h3>
+        <div style="width:88px"></div>
+      </div>
+
+      <div class="grid cols-7" id="calGridHeader">
+        <div class="dow">Lun</div><div class="dow">Mar</div><div class="dow">Mié</div>
+        <div class="dow">Jue</div><div class="dow">Vie</div><div class="dow">Sáb</div><div class="dow">Dom</div>
+      </div>
+      <div class="grid cols-7" id="calGrid"></div>
+    </div>
+
+    <!-- Detalle -->
+    <div class="card" id="detail">
+      <h3 id="d_title">Selecciona un evento</h3>
+      <div id="d_meta" class="meta"></div>
+      <div style="max-height:420px; overflow:auto;">
+        <table>
+          <thead><tr><th>Código</th><th>Descripción</th><th class="right">Metros</th><th class="right">Rollos</th></tr></thead>
+          <tbody id="d_rows"></tbody>
+          <tfoot><tr><th colspan="2">Totales</th><th id="d_m_total" class="right"></th><th id="d_r_total" class="right"></th></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/calendar_sellers.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+:root{
+  /* colores corporativos (ajusta si quieres) */
+  --brand:#0c4f97;         /* azul TLN */
+  --brand-600:#0a4280;
+  --brand-700:#08386c;
+  --accent:#d81e14;        /* rojo TLN */
+  --bg:#f7f7fb;
+  --ink:#111;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --radius:12px;
+}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+
+header.appbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:14px 20px;background:var(--brand);color:#fff;
+  position:sticky;top:0;z-index:20
+}
+.appbar .brand{
+  display:flex;align-items:center;gap:12px;font-weight:600;font-size:18px
+}
+.appbar img{height:32px;display:block}
+.appbar a.btn{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.35);
+  padding:6px 12px;border-radius:10px}
+.appbar a.btn:hover{background:rgba(255,255,255,.1)}
+
+.card{
+  background:#fff;border-radius:var(--radius);
+  box-shadow:0 2px 8px rgba(0,0,0,.06);padding:16px
+}
+
+.btn-primary{
+  background:var(--brand);color:#fff;border:0;border-radius:10px;
+  padding:10px 14px;font-weight:600;cursor:pointer
+}
+.btn-primary:hover{background:var(--brand-600)}
+.btn-primary:active{background:var(--brand-700)}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+.badge-accent{background:#fde6e4;color:var(--accent);border:1px solid #f7b6b2}
+
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--line);padding:8px 10px;font-size:14px}
+.table th{background:#fafafa;text-align:left}
+
+::-webkit-scrollbar{height:10px;width:10px}
+::-webkit-scrollbar-thumb{background:#cfd4dc;border-radius:20px}
+.pill{background:#e6eef9;color:var(--brand)}
+.pill:hover{filter:brightness(.98)}
+/* Resaltar columna del día seleccionado */
+.fc .fc-col-header-cell.dow-highlight {
+  background: rgba(37, 99, 235, 0.18); /* azul suave header */
+}
+.fc .fc-daygrid-day.dow-highlight {
+  background: rgba(37, 99, 235, 0.12); /* azul suave celdas */
+}

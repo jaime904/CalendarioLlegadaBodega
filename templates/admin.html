@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <style>
+    :root{ --morado:#4b0082; }
+    *{ box-sizing:border-box; }
+    body{ font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; background:#f7f7fb; color:#222; }
+    header{ background:var(--morado); color:#fff; padding:16px 20px; }
+    main{ padding:16px 20px; display:grid; grid-template-columns:360px 1fr; gap:20px; }
+    .card, form{ background:#fff; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    h2,h3{ margin:0 0 10px; }
+    label{ display:block; font-size:12px; color:#555; margin:8px 0 4px; }
+    input, textarea, button{ width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
+    textarea{ resize:vertical; min-height:68px; }
+    button{ background:var(--morado); color:#fff; border:none; cursor:pointer; }
+    .cols{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    .muted{ color:#666; font-size:12px; }
+    .kv{ display:grid; grid-template-columns: 160px 1fr; gap:8px 12px; margin-top:6px; }
+    .kv .k{ font-weight:600; color:#333; }
+    table{ width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td{ padding:6px 8px; border-bottom:1px solid #eee; font-size:13px; }
+    th{ text-align:left; background:#fafafa; position:sticky; top:0; }
+    .right{ text-align:right; }
+    .list{ display:flex; flex-direction:column; gap:8px; }
+    .item{ border:1px solid #eee; border-radius:8px; padding:10px; cursor:pointer; background:#fff; }
+    .item:hover{ background:#fafafa; }
+    .pill{ display:inline-block; background:#eee; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px; }
+    .hidden{ display:none; }
+    @media (max-width: 900px){ main{ grid-template-columns:1fr; } }
+  </style>
+  <title>Calendario de Llegadas a Bodega</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='brand.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo-tln.png') }}">
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand">
+      <!-- si no tienes logo, comenta la línea de abajo -->
+      <img src="{{ url_for('static', filename='img/logo-tln.png') }}" alt="TLN">
+      <span>Calendario de Llegadas a Bodega</span>
+    </div>
+    <a class="btn" href="/logout">Salir</a>
+  </header>
+
+  <main class="container-2col">
+    <!-- IZQUIERDA: Formulario -->
+    <form id="uploadForm" method="post" enctype="multipart/form-data" action="/upload" class="card">
+      <h3>Nuevo desde PDF</h3>
+
+      <label>BL (opcional)</label>
+      <input name="bl" placeholder="Ej: CHI-059-2025">
+
+      <label>Puerto (opcional)</label>
+      <input name="port" placeholder="San Antonio">
+
+      <label>Notas (opcional)</label>
+      <textarea name="notes" placeholder="Observaciones"></textarea>
+
+      <label>Fecha de llegada (opcional)</label>
+      <input type="date" name="date_override">
+
+      <label>Archivo PDF</label>
+      <input type="file" name="pdf" accept="application/pdf" required>
+
+      <div class="row">
+        <button type="submit" class="btn-primary">Subir y parsear</button>
+        <span id="uploadStatus" class="muted"></span>
+      </div>
+    </form>
+
+    <!-- DERECHA: Resultado + Lista -->
+    <div class="cols">
+      <!-- Resultado del PDF -->
+      <div class="card">
+        <h3>Datos detectados</h3>
+        <div id="emptyHint" class="muted">Sube un PDF para ver aquí los datos extraídos.</div>
+
+        <div id="preview" class="hidden">
+          <div class="kv">
+            <div class="k">BL</div><div id="pBL" class="v">—</div>
+            <div class="k">Puerto</div><div id="pPort" class="v">—</div>
+            <div class="k">Fecha llegada</div><div id="pDate" class="v">—</div>
+            <div class="k">Notas</div><div id="pNotes" class="v">—</div>
+          </div>
+
+          <div class="scroll">
+            <table class="table">
+              <thead>
+                <tr><th>Código</th><th>Descripción</th><th class="right">Metros</th><th class="right">Rollos</th></tr>
+              </thead>
+              <tbody id="pRows"></tbody>
+              <tfoot>
+                <tr><th colspan="2">Totales</th><th id="pM" class="right"></th><th id="pR" class="right"></th></tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de contenedores guardados -->
+      <div class="card">
+        <div class="row-between">
+          <h3>Contenedores guardados</h3>
+          <button id="btnReload" type="button" class="btn-outline">Actualizar</button>
+        </div>
+        <div id="list" class="list"></div>
+
+        <!-- Detalle seleccionado -->
+        <div id="detail" class="hidden" style="margin-top:12px;">
+          <h3 id="d_title"></h3>
+          <div id="d_meta" class="muted" style="margin-bottom:8px;"></div>
+          <div class="scroll">
+            <table class="table">
+              <thead>
+                <tr><th>Código</th><th>Descripción</th><th class="right">Metros</th><th class="right">Rollos</th></tr>
+              </thead>
+              <tbody id="d_rows"></tbody>
+              <tfoot>
+                <tr><th colspan="2">Totales</th><th id="d_m_total" class="right"></th><th id="d_r_total" class="right"></th></tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='main.js') }}?v=10"></script>
+</body>
+</html>
