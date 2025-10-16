@@ -2,64 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <style>
-    :root{ --morado:#4b0082; }
-    *{ box-sizing:border-box; }
-    body{ font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; background:#f7f7fb; color:#222; }
-    header{ background:var(--morado); color:#fff; padding:16px 20px; }
-    main{ padding:16px 20px; display:grid; grid-template-columns:360px 1fr; gap:20px; }
-    .card, form{ background:#fff; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-    h2,h3{ margin:0 0 10px; }
-    label{ display:block; font-size:12px; color:#555; margin:8px 0 4px; }
-    input, textarea, button{ width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
-    textarea{ resize:vertical; min-height:68px; }
-    button{ background:var(--morado); color:#fff; border:none; cursor:pointer; }
-    .cols{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-    .muted{ color:#666; font-size:12px; }
-    .kv{ display:grid; grid-template-columns: 160px 1fr; gap:8px 12px; margin-top:6px; }
-    .kv .k{ font-weight:600; color:#333; }
-    table{ width:100%; border-collapse:collapse; margin-top:10px; }
-    th, td{ padding:6px 8px; border-bottom:1px solid #eee; font-size:13px; }
-    th{ text-align:left; background:#fafafa; position:sticky; top:0; }
-    .right{ text-align:right; }
-    .list{ display:flex; flex-direction:column; gap:8px; }
-    .item{ border:1px solid #eee; border-radius:8px; padding:10px; cursor:pointer; background:#fff; }
-    .item:hover{ background:#fafafa; }
-    .pill{ display:inline-block; background:#eee; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px; }
-    .hidden{ display:none; }
-    @media (max-width: 900px){ main{ grid-template-columns:1fr; } }
-  </style>
   <title>Calendario de Llegadas a Bodega</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --morado:#1f4690; --bg:#f7f7fb; --card:#fff; --line:#e9e9ef; --text:#222; --muted:#666;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); }
+    header{ background:var(--morado); color:#fff; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
+    header .brand{ display:flex; align-items:center; gap:10px; font-weight:700 }
+    header a.btn{ color:#fff; text-decoration:none; background:rgba(255,255,255,.15); padding:8px 12px; border-radius:8px }
+    main{ padding:16px; display:grid; grid-template-columns:360px 1fr; gap:16px; }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,.04)}
+    h2,h3{ margin:0 0 10px }
+    label{ display:block; font-size:12px; color:#444; margin:8px 0 4px }
+    input[type="file"], input, textarea, button{ width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px }
+    button{ background:var(--morado); color:#fff; border:none; cursor:pointer }
+    .btn-outline{ background:#fff; color:#1f4690; border:1px solid #c9d3f7 }
+    .row{ display:flex; gap:8px; align-items:center; margin-top:10px }
+    .row-between{ display:flex; justify-content:space-between; align-items:center }
+    .cols{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
+    .scroll{ max-height:320px; overflow:auto }
+    .muted{ color:var(--muted); font-size:13px }
+    .list{ display:flex; flex-direction:column; gap:8px }
+    .item{ border:1px solid var(--line); border-radius:8px; padding:10px; cursor:pointer; background:#fff }
+    .item:hover{ background:#fafafa }
+    .pill{ display:inline-block; background:#eee; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px }
+    .kv{ display:grid; grid-template-columns:120px 1fr; gap:6px 10px; margin-bottom:10px }
+    .kv .k{ font-weight:600; color:#333 }
+    table{ width:100%; border-collapse:collapse; margin-top:10px }
+    th,td{ padding:6px 8px; border-bottom:1px solid #eee; font-size:13px }
+    th{ text-align:left; background:#fafafa; position:sticky; top:0 }
+    .right{ text-align:right }
+    .hidden{ display:none }
+    @media (max-width: 900px){ main{ grid-template-columns:1fr } }
+  </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='brand.css') }}">
   <link rel="icon" href="{{ url_for('static', filename='img/logo-tln.png') }}">
 </head>
 <body>
-  <header class="appbar">
+  <header>
     <div class="brand">
-      <!-- si no tienes logo, comenta la línea de abajo -->
-      <img src="{{ url_for('static', filename='img/logo-tln.png') }}" alt="TLN">
+      <img src="{{ url_for('static', filename='img/logo-tln.png') }}" alt="TLN" height="28">
       <span>Calendario de Llegadas a Bodega</span>
     </div>
-    <a class="btn" href="/logout">Salir</a>
+    <a id="logoutLink" class="btn" href="/logout">Salir</a>
   </header>
 
-  <main class="container-2col">
-    <!-- IZQUIERDA: Formulario -->
+  <main>
+    <!-- IZQUIERDA: SOLO subir PDF -->
     <form id="uploadForm" method="post" enctype="multipart/form-data" action="/upload" class="card">
       <h3>Nuevo desde PDF</h3>
-
-      <label>BL (opcional)</label>
-      <input name="bl" placeholder="Ej: CHI-059-2025">
-
-      <label>Puerto (opcional)</label>
-      <input name="port" placeholder="San Antonio">
-
-      <label>Notas (opcional)</label>
-      <textarea name="notes" placeholder="Observaciones"></textarea>
-
-      <label>Fecha de llegada (opcional)</label>
-      <input type="date" name="date_override">
 
       <label>Archivo PDF</label>
       <input type="file" name="pdf" accept="application/pdf" required>
@@ -74,7 +68,15 @@
     <div class="cols">
       <!-- Resultado del PDF -->
       <div class="card">
-        <h3>Datos detectados</h3>
+        <div class="row-between">
+          <h3>Datos detectados</h3>
+          <div>
+            <button id="btnEdit"   type="button" class="btn-outline hidden">Editar</button>
+            <button id="btnSave"   type="button" class="btn-outline hidden">Guardar</button>
+            <button id="btnCancel" type="button" class="btn-outline hidden">Cancelar</button>
+          </div>
+        </div>
+
         <div id="emptyHint" class="muted">Sube un PDF para ver aquí los datos extraídos.</div>
 
         <div id="preview" class="hidden">
@@ -84,7 +86,6 @@
             <div class="k">Fecha llegada</div><div id="pDate" class="v">—</div>
             <div class="k">Notas</div><div id="pNotes" class="v">—</div>
           </div>
-
           <div class="scroll">
             <table class="table">
               <thead>
@@ -127,6 +128,6 @@
     </div>
   </main>
 
-  <script src="{{ url_for('static', filename='main.js') }}?v=10"></script>
+  <script src="{{ url_for('static', filename='main.js') }}?v=11"></script>
 </body>
 </html>

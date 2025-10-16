@@ -1,14 +1,14 @@
-# parser_pdf.py
-# -*- coding: utf-8 -*-
+
 import re
 import fitz  # PyMuPDF
+from typing import Optional, Tuple, List
 
 # -------------------------------
 # Prefijos aceptados (agrega los que necesites)
 # -------------------------------
 PREFIXES = {
     "DC", "TX", "IMPO",
-    "TU", "FK", "PT", "RTN", "HRS", "DG", "TN", "PE"
+    "TU", "FK", "PT", "RTN", "HRS", "DG", "TN", "PE","TEC"
 }
 PREFIX_RE_STR = "(?:" + "|".join(sorted(PREFIXES, key=len, reverse=True)) + ")"
 
@@ -29,7 +29,7 @@ def _normalize_number(s: str) -> float:
         return 0.0
 
 
-def _to_iso(date_str: str) -> str | None:
+def _to_iso(date_str: str) -> Optional[str]:
     m = DATE_RE.search(date_str or "")
     if not m:
         return None
@@ -93,14 +93,14 @@ def _group_words_into_rows(words, y_tol=3.0):
     return rows
 
 
-def _pick_meters_rolls_from_tokens(tokens: list[str]) -> tuple[str | None, str | None]:
+def _pick_meters_rolls_from_tokens(tokens: List[str]) -> Tuple[Optional[str], Optional[str]]:
     """
     Recorre tokens de derecha a izquierda:
     - ROLLOS = primer ENTERO puro
     - METROS = primer número inmediatamente a su izquierda
     """
-    rolls_txt = None
-    meters_txt = None
+    rolls_txt: Optional[str] = None
+    meters_txt: Optional[str] = None
     for t in reversed(tokens):
         if _is_int_token(t):
             rolls_txt = t
